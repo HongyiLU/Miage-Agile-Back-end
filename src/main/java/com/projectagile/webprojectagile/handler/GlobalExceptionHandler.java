@@ -4,12 +4,16 @@ import com.projectagile.webprojectagile.enums.ResultEnum;
 import com.projectagile.webprojectagile.utils.ResultVOUtils;
 import com.projectagile.webprojectagile.vo.res.BaseResVO;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -54,5 +58,23 @@ public class GlobalExceptionHandler {
     public BaseResVO handlerInternalAuthenticationServiceException(InternalAuthenticationServiceException e) {
         log.error(e.getMessage());
         return ResultVOUtils.error(ResultEnum.USER_NOT);
+    }
+
+    @ExceptionHandler(value = BadCredentialsException.class)
+    public BaseResVO handlerBadCredentialsException(BadCredentialsException e){
+        log.warn(e.getMessage());
+        return ResultVOUtils.error(ResultEnum.USER_WRONG);
+    }
+
+    @ExceptionHandler(value = DisabledException.class)
+    public BaseResVO handlerDisabledException(DisabledException e){
+        log.warn(e.getMessage());
+        return ResultVOUtils.error(ResultEnum.USER_EMAIL_NOT);
+    }
+
+    @ExceptionHandler(value = DataIntegrityViolationException.class)
+    public BaseResVO handlerDataIntegrityViolationException(DataIntegrityViolationException e){
+        log.warn(e.getMessage());
+        return ResultVOUtils.error(ResultEnum.DATA_REPEAT);
     }
 }

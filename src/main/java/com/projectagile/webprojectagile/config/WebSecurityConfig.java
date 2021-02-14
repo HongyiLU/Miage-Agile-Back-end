@@ -5,8 +5,9 @@ et par conséquent, elle sera analysée par Spring durant l'exécution de  l'app
 package com.projectagile.webprojectagile.config;
 
 import com.projectagile.webprojectagile.security.AuthTokenFilter;
+import com.projectagile.webprojectagile.security.CustomLogoutHandler;
 import com.projectagile.webprojectagile.security.CustomLogoutSuccessHandler;
-import com.projectagile.webprojectagile.security.DefaulUserDetailsService;
+import com.projectagile.webprojectagile.security.DefaultUserDetailsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +36,7 @@ import java.io.IOException;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    DefaulUserDetailsService userDetailsService;
+    DefaultUserDetailsService userDetailsService;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder(){
@@ -56,24 +57,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.cors().and().csrf().disable()
                 .authorizeRequests()
                 .antMatchers(listLoginPathExclude).permitAll()
-//                .antMatchers(listPathExcludeNoAuthentication).permitAll()
+                .antMatchers(listPathExcludeNoAuthentication).permitAll()
 //                .antMatchers(listPathExcludeIndividual).hasAuthority("USER_INDIVIDUAL")
 //                .anyRequest().authenticated()
-                .and().logout().logoutUrl("/user/logout").logoutSuccessHandler(new CustomLogoutSuccessHandler()).deleteCookies("JSESSIONID").permitAll()
+                .and().logout().logoutUrl("/user/logout").addLogoutHandler(customLogoutHandlerBean()).logoutSuccessHandler(new CustomLogoutSuccessHandler()).permitAll()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPoint() {
-                    @Override
-                    public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-                        log.warn("Illegal request occurred, request to [{}], AuthenticationException='{}'", httpServletRequest.getRequestURI(), e.getMessage());
-                        httpServletRequest.getRequestDispatcher("/user/login-error").forward(httpServletRequest, httpServletResponse);
-                    }
+                .and().exceptionHandling().authenticationEntryPoint((httpServletRequest, httpServletResponse, e) -> {
+                    log.warn("Illegal request occurred, request to [{}], AuthenticationException='{}'", httpServletRequest.getRequestURI(), e.getMessage());
+                    httpServletRequest.getRequestDispatcher("/user/login-error").forward(httpServletRequest, httpServletResponse);
                 })
-                .accessDeniedHandler(new AccessDeniedHandler() {
-                    @Override
-                    public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AccessDeniedException e) throws IOException, ServletException {
-                        log.warn("Access denied, request to [{}], AuthenticationException= '{}'", httpServletRequest.getRequestURI(), e.getMessage());
-                        httpServletRequest.getRequestDispatcher("/user/login-error").forward(httpServletRequest, httpServletResponse);
-                    }
+                .accessDeniedHandler((httpServletRequest, httpServletResponse, e) -> {
+                    log.warn("Access denied, request to [{}], AuthenticationException= '{}'", httpServletRequest.getRequestURI(), e.getMessage());
+                    httpServletRequest.getRequestDispatcher("/user/login-error").forward(httpServletRequest, httpServletResponse);
                 });
                 httpSecurity.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
@@ -89,4 +84,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new AuthTokenFilter();
     }
 
+    @Bean
+    public CustomLogoutHandler customLogoutHandlerBean(){return new CustomLogoutHandler();}
 }

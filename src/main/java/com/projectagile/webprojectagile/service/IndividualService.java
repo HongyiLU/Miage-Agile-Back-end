@@ -18,7 +18,7 @@ public interface IndividualService {
 
     Individual findIndividualById(String uid);
 
-    boolean isExistIndividual(Individual individual);
 
     Individual updateIndividualInfo(Individual individual);
+
 }

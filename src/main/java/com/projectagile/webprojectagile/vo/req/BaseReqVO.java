@@ -8,6 +8,9 @@ import java.util.UUID;
  * Classe de base pour "request VO"
  * Classe mère utilisée par les classes "ReqVO"
  * Pour chaque requête il y a un numéro et un timestamp
+ * Classe de base pour "request VO"
+ * Classe mère utilisée par les classes "ReqVO"
+ * Pour chaque requête il y a un numéro et un timestamp
  */
 
 @Data

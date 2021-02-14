@@ -26,7 +26,7 @@ public class IndividualController {
     IndividualServiceImpl individualService;
 
     @PostMapping("/find-all-individual")
-    public BaseResVO findAllIndividual() {
+    public BaseResVO findAllParticulier() {
         List<Individual> userList = individualService.findAllIndividual();
         if (userList != null) {
             return ResultVOUtils.success(userList);
@@ -55,5 +55,4 @@ public class IndividualController {
             return ResultVOUtils.error(ResultEnum.USER_NOT);
         }
     }
-
 }
