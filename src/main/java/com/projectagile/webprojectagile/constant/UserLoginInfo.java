@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 public class UserLoginInfo {
 
+    private String uid;
+
     private String userEmail;
 
     //Json Web Token : token qui identifie la situation de l'authentification

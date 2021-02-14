@@ -1,6 +1,6 @@
 package com.projectagile.webprojectagile.controller;
 
-import com.projectagile.webprojectagile.entity.UserLoginInfo;
+import com.projectagile.webprojectagile.constant.UserLoginInfo;
 import com.projectagile.webprojectagile.enums.ResultEnum;
 import com.projectagile.webprojectagile.security.UserDetails.UserDetailsImpl;
 import com.projectagile.webprojectagile.utils.JwtUtils;
